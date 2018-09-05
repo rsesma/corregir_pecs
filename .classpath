@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="/Users/r/git/corregir_pecs/src/ext_jar/itextpdf-5.5.10.jar"/>
-	<classpathentry kind="lib" path="/Users/r/git/corregir_pecs/src/ext_jar/sfi-api.jar"/>
-	<classpathentry kind="lib" path="/Users/r/git/corregir_pecs/src/ext_jar/commons-io-2.6.jar"/>
+	<classpathentry kind="lib" path="src/ext_jar/commons-io-2.6.jar"/>
+	<classpathentry kind="lib" path="src/ext_jar/itextpdf-5.5.10.jar"/>
+	<classpathentry kind="lib" path="src/ext_jar/sfi-api.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
