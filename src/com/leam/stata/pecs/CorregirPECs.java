@@ -29,7 +29,6 @@ public class CorregirPECs {
 	private static final String C_ERROR_ARXIU_ZIP = "arxiu zip no vàlid";
 	private static final String C_ERROR_ARXIU_SOL = "arxiu solució no vàlid";
 	private static final String C_ERROR_CHECK_PECS = "error comprovant les PECs";
-	private static final String C_ERROR_OBRINT_PECS = "error obrint PECs";
 	private static final String C_ERROR_OBRINT_SOL = "error obrint l'arxiu solució";
 	
 	private static final String C_ARXIUS_DESCOMPRIMITS = "Arxius descomprimits a";
