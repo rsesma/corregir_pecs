@@ -32,7 +32,8 @@ public class CorregirPECs {
 	private static final String C_ERROR_OBRINT_SOL = "error obrint l'arxiu solució";
 	
 	private static final String C_ARXIUS_DESCOMPRIMITS = "Arxius descomprimits a";
-	private static final String C_CARPETA_PDFS_JA_EXISTEIX = "La carpeta pdfs ja existeix; no cal descomprimir";
+	private static final String C_CARPETA_PDFS_JA_EXISTEIX = "La carpeta pdfs ja existeix";
+	private static final String C_NO_CAL_DESCOMPRIMIR = "no cal descomprimir";
 	
     /**
      * Extracts a zip file specified by args[0] to a directory 
@@ -70,9 +71,9 @@ public class CorregirPECs {
 				}
 				SFIToolkit.displayln(C_ARXIUS_DESCOMPRIMITS + ": " + destDir.getAbsolutePath());
 				
-				CheckPECs(destDir.getAbsolutePath());
+				checkPECs(destDir.getAbsolutePath());
 			} else {
-				SFIToolkit.displayln(C_CARPETA_PDFS_JA_EXISTEIX + " (" + destDir.getAbsolutePath() + ")");
+				SFIToolkit.displayln(C_CARPETA_PDFS_JA_EXISTEIX + " (" + destDir.getAbsolutePath() + ") ;" + C_NO_CAL_DESCOMPRIMIR);
 			}
 		} else {
 			SFIToolkit.errorln(C_ERROR_ARXIU_ZIP);
@@ -105,7 +106,7 @@ public class CorregirPECs {
      * Checks the files of dirPath as correct PECs
      * @param pecsPath
      */
-    private static int CheckPECs(String pecsPath) {
+    private static int checkPECs(String pecsPath) {
         Boolean lproblems = false;
         File folder = new File(pecsPath);					// PECs folder
         File problems = new File(pecsPath,C_PROBLEMES);		// folder for problem files
@@ -118,21 +119,19 @@ public class CorregirPECs {
 		        	String name = f.getName();
 		        	String ext = name.substring(name.lastIndexOf(".")+1);
 		        	// PDF?
-		        	lproblems = !ext.equalsIgnoreCase("pdf"); 
-		        	if (!lproblems) {
+		        	if (ext.equalsIgnoreCase("pdf")) {
 		                PdfReader reader = new PdfReader(f.getAbsolutePath());
 		                AcroFields form = reader.getAcroFields();
 		                int nsize = form.getFields().size();
 		                reader.close();
 		                // fields?		                
-		                lproblems = (nsize==0);
-		                
-		        	} 
+		                if (nsize==0) lproblems = true;
+		        	} else { lproblems = true; }
 		        	// if problems, move to problems dir
 		        	if (lproblems) f.renameTo(new File(problems.getAbsolutePath(),f.getName()));
 		        }
 		    }			
-			if (lproblems) {
+		    if (lproblems) {
 				SFIToolkit.error(C_ATENCIO + ": ");
 				SFIToolkit.displayln(C_HI_HA_PROBLEMES + " " + problems.getAbsolutePath());
 			}
@@ -150,7 +149,7 @@ public class CorregirPECs {
 	public static int getPECData(String args[]) {
 		//File pdfs = new File(new File(args[0]).getParentFile().getAbsolutePath(),C_PDFS);
 		
-		GetPlantilla(args[1]);
+		getPlantilla(args[1]);
 				
 /*		Boolean first = true;
 		
@@ -181,7 +180,7 @@ public class CorregirPECs {
 		return(0);
 	}
 	
-	private static int GetPlantilla(String dirSol) {
+	private static int getPlantilla(String dirSol) {
 		File f = new File(dirSol);
 		
 		if (f.exists()) {
@@ -190,7 +189,9 @@ public class CorregirPECs {
 		    	try {
 		    		it.nextLine();		// first line has field names, not useful
 		    	    while (it.hasNext()) {
-		    	    	SFIToolkit.displayln(it.nextLine());
+		    	    	String[] d = it.nextLine().split(",");
+		    	    	String name = d[1].replace("'", "");
+		    	    	Data.addVarStr(name, 10);
 		    	    }
 		    	} catch (Exception e) {
 					SFIToolkit.errorln(C_ERROR_OBRINT_SOL);
