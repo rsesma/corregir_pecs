@@ -62,8 +62,7 @@ public class CorregirPECs {
 			        while (entry != null) {
 			            String filePath = destDir.getAbsolutePath() + File.separator + entry.getName();
 			            if (!entry.isDirectory()) {
-			                // if the entry is a file, extracts it
-			                extractFile(zipIn, filePath);
+			                extractFile(zipIn, filePath);		// if the entry is a file, extracts it
 			            }
 			            zipIn.closeEntry();
 			            entry = zipIn.getNextEntry();
@@ -112,7 +111,7 @@ public class CorregirPECs {
      */
     private static int checkPECs(String pecsPath) {
         Boolean lproblems = false;
-        File folder = new File(pecsPath);					// PECs folder
+    	File folder = new File(pecsPath);					// PECs folder
         File problems = new File(pecsPath,C_PROBLEMES);		// folder for problem files
         if (!problems.exists()) problems.mkdir();			// make pdfs dir
         
@@ -120,6 +119,7 @@ public class CorregirPECs {
 		    for (File f : folder.listFiles()) {
 				// loop through not hidden files
 		        if (f.isFile() && !f.isHidden()) {
+		            lproblems = false;
 		        	String name = f.getName();
 		        	String ext = name.substring(name.lastIndexOf(".")+1);
 		        	// PDF?
@@ -128,9 +128,9 @@ public class CorregirPECs {
 		                AcroFields form = reader.getAcroFields();
 		                int nsize = form.getFields().size();
 		                reader.close();
-		                // fields?		                
-		                if (nsize==0) lproblems = true;
+		                if (nsize==0) lproblems = true;			// fields?
 		        	} else { lproblems = true; }
+		        	
 		        	// if problems, move to problems dir
 		        	if (lproblems) f.renameTo(new File(problems.getAbsolutePath(),f.getName()));
 		        }
@@ -260,15 +260,17 @@ public class CorregirPECs {
 		File pec_freq = new File(new File(args[0]).getParentFile().getAbsolutePath(),"pec_freq.dta");
 		SFIToolkit.executeCommand("qui use " + pec_freq.getAbsolutePath() + ", clear", false);
 		for (Pregunta p : Plantilla) {
-			SFIToolkit.executeCommand("qui preserve", false);
-			SFIToolkit.executeCommand("qui keep *" + p.nom, false);
-			SFIToolkit.executeCommand("qui drop c" + p.nom, false);
-			SFIToolkit.executeCommand("qui rename " + p.nom + " value", false);
-			SFIToolkit.executeCommand("qui rename p" + p.nom + " percent", false);
-			SFIToolkit.executeCommand("qui drop if missing(percent)", false);
-			SFIToolkit.executeCommand("gsort -percent", false);
-			SFIToolkit.executeCommand("list, clean", false);
-			SFIToolkit.executeCommand("qui restore", false);
+			SFIToolkit.displayln(p.nom);
+			SFIToolkit.executeCommand("pecs getPercent " + p.nom, false);
+			long nrows = Mata.getMataRowTotal("v" + p.nom);
+			SFIToolkit.displayln("nrows = " + nrows);
+			for (long i = 0; i < nrows; i++) {
+				double percent = Mata.getMataRealAt("p" + p.nom, i, 0);
+				String value = Mata.getMataStringAt("v" + p.nom, i, 0);
+				
+				String index = "[" + (i + 1) + "]";
+				SFIToolkit.displayln(index + " = " + value + "; " + Double.toString(percent));
+			}
 		}
 		
 		return(0);
@@ -276,9 +278,6 @@ public class CorregirPECs {
 
 
 	public static void main(String args[]) {
-/*		String dirZIP = "C:\\Users\\tempo\\Desktop\\CorregirPECs\\PEC4_DE0\\PECS_DE0_2017-18.zip";
-		String dirSol = "C:\\Users\\tempo\\Desktop\\CorregirPECs\\PEC4_DE0\\sol.txt";
-		String params[] = {dirZIP, dirSol};
-		getPECData(params);*/
+		
 	}
 }
